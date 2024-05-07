@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Price Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        #add-ticker-form {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        #new-ticker {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        #add-ticker-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #add-ticker-form button:hover {
+            background-color: #0056b3;
+        }
+
+        #timer {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        #tickers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .ticker-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .ticker-card h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #007bff;
+        }
+
+        .ticker-card p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        #portfolio-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        #portfolio-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</head>
+<body>
+    <form id="add-ticker-form">
+        <input type="text" id="new-ticker" placeholder="Add ticker" required>
+        <button type="submit">Add to watchlist</button>
+    </form>
+    <p id="timer">Next update in <span id="counter"></span> seconds.</p>
+    <div id="tickers-grid"></div>
+    <a href="/portfolio" id="portfolio-btn">View Portfolio</a>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 12px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .green-bg {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .red-bg {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            outline: none;
+        }
+
+        .action-btn:hover {
+            background-color: #ddd;
+        }
+
+        .buy-action {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .sell-action {
+            background-color: #F44336;
+            color: white;
+        }
+
+        #totals {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        #totals strong {
+            color: #333;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        #total-portfolio-value, #total-invested-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to update market values
+            function updateMarketValues() {
+                var totalPortfolioValue = 0;
+                var totalInvestedAmount = 0;
+
+                $('.stock-row').each(function() {
+                    var ticker = $(this).data('ticker');
+                    $.ajax({
+                        url: '/get_stock_data',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ 'ticker': ticker }),
+                        success: function(response) {
+                            var currentPrice = response.currentPrice;
+                            var averagePrice = parseFloat($('#averagePrice-' + ticker).text());
+                            var quantity = parseInt($('#quantity-' + ticker).text());
+                            var costBasis = parseFloat($('#CostBasis-' + ticker).text());
+                            var marketValue = currentPrice * quantity;
+                            var percentageChange = ((currentPrice - averagePrice) / averagePrice) * 100;
+                            var profit = marketValue - costBasis;
+                            $('#marketValue-' + ticker).text(marketValue.toFixed(2));
+                            $('#percentageChange-' + ticker).text(percentageChange.toFixed(2) + '%');
+                            $('#profit-' + ticker).text(profit.toFixed(2));
+                            if (currentPrice > averagePrice) {
+                                $('#marketValue-' + ticker).addClass('green-bg');
+                            } else if (currentPrice < averagePrice) {
+                                $('#marketValue-' + ticker).addClass('red-bg');
+                            } else {
+                                $('#marketValue-' + ticker).removeClass('green-bg red-bg');
+                            }
+
+                            // Calculate total portfolio value and total invested amount
+                            totalPortfolioValue += marketValue;
+                            totalInvestedAmount += costBasis;
+
+                            // Update the display counters
+                            $('#total-portfolio-value').text(totalPortfolioValue.toFixed(2));
+                            $('#total-invested-amount').text(totalInvestedAmount.toFixed(2));
+                        },
+                        error: function(error) {
+                            console.error('Error fetching stock data:', error);
+                        }
+                    });
+                });
+            }
+
+            // Initial update
+            updateMarketValues();
+
+            // Update every 14 seconds
+            setInterval(updateMarketValues, 14000);
+
+            // Buy action
+            $('.buy-action').click(function() {
+                var ticker = $(this).data('ticker');
+                window.location.href = '/buy/' + ticker;
+            });
+
+            // Sell action
+            $('.sell-action').click(function() {
+                var ticker = $(this).data('ticker');
+                window.location.href = '/sell/' + ticker;
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Portfolio</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Quantity</th>
+                <th>Average Price</th>
+                <th>Cost Basis</th>
+                <th>Market Value</th>
+                <th>Percentage Change</th>
+                <th>Profit</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in portfolio_data %}
+            <tr class="stock-row" data-ticker="{{ entry.ticker }}">
+                <td>{{ entry.ticker }}</td>
+                <td id="quantity-{{ entry.ticker }}">{{ entry.quantity }}</td>
+                <td id="averagePrice-{{ entry.ticker }}">{{ entry.average_price }}</td>
+                <td id="CostBasis-{{ entry.ticker }}">{{ entry.Cost_Basis }}</td>
+                <td id="marketValue-{{ entry.ticker }}"></td>
+                <td id="percentageChange-{{ entry.ticker }}"></td>
+                <td id="profit-{{ entry.ticker }}"></td>
+                <td>
+                    <button class="action-btn buy-action" data-ticker="{{ entry.ticker }}">Buy</button>
+                    <button class="action-btn sell-action" data-ticker="{{ entry.ticker }}">Sell</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div id="totals">
+        <strong>Total Portfolio Value:</strong> <span id="total-portfolio-value">0.00</span><br>
+        <strong>Total Invested Amount:</strong> <span id="total-invested-amount">0.00</span><br>
+    </div>
+    <a href="/">Back to watchlist</a>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Detail - {{ ticker }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="stock-detail-container">
+        <h1 id="stockTicker">Loading Stock Details...</h1>
+        <p><strong>Price:</strong> <span id="currentPrice">Loading...</span></p>
+        <p><strong>Change:</strong> <span id="priceChange">Loading...</span>%</p>
+        <p><strong>Description:</strong> <span id="stockDescription">Loading...</span></p>
+        <form id="portfolioForm" action="/add_to_portfolio" method="post">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" required><br><br>
+            <label for="exactPrice">Exact Price:</label>
+            <input type="number" id="price" name="price" step="0.01" required><br><br>
+            <input type="hidden" name="ticker" value="{{ ticker }}">
+            <input type="submit" value="Add to Portfolio"><br><br>
+        </form>
+        <a href="/">Back to watchlist</a>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Get the current price displayed on the page
+            var currentPrice = parseFloat($("#currentPrice").text().replace("$", ""));
+            
+            // Autofill the "Exact Price" input field with the current price
+            $("#price").val(currentPrice.toFixed(2));
+            
+            // Optional: Update the exact price if the current price changes dynamically
+            // This might happen if the user stays on the page for a while
+            setInterval(function() {
+                currentPrice = parseFloat($("#currentPrice").text().replace("$", ""));
+                $("#price").val(currentPrice.toFixed(2));
+            }, 1000); // Update every second (adjust as needed)
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Detail - {{ ticker }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="stock-detail-container">
+        <h1 id="stockTicker">Loading Stock Details...</h1>
+        <p><strong>Price:</strong> <span id="currentPrice">Loading...</span></p>
+        <p><strong>Change:</strong> <span id="priceChange">Loading...</span>%</p>
+        <p><strong>Description:</strong> <span id="stockDescription">Loading...</span></p>
+        <a href="/">Back to watchlist</a>
+    </div>
+</body>
+</html>
